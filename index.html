@@ -91,8 +91,9 @@
             margin-top: 20px;
             border: 2px solid #06b6d4;
             border-radius: 8px;
-            width: 550px;
-            height: 600px;
+            width: 100%;
+            max-width: 400px;/* Ajusta según necesites */
+            height: auto;
             margin: auto;
             display: none;
         }
@@ -200,7 +201,8 @@
             <h2>Inventario por Barcode</h2>
             <p>Barcode: <input id="barcodeConsulta" placeholder="Escanea o escribe barcode"> <button
                     onclick="actualizarTablaConsulta(document.getElementById('barcodeConsulta').value)">Buscar</button>
-                <button onclick="exportarInventario()">Exportar Excel</button></p>
+                <button onclick="exportarInventario()">Exportar Excel</button>
+            </p>
             <table>
                 <thead>
                     <tr>
