@@ -2,384 +2,549 @@
 <html lang="es">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Inventario 2.0</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Inventario 2.0</title>
 
-<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<style>
-* { box-sizing: border-box; margin:0; padding:0; font-family: Arial; }
-body { background: #20263f; color: #acacac; padding:20px; text-align:center; }
-.container { max-width:500px; margin:auto; background:#1e293b; padding:25px; border-radius:12px; }
-.logo { height:80px; margin-bottom:10px; }
-.store { color:red; margin-bottom:20px; }
-h1 { color:white; margin-bottom:20px; }
-button { padding:12px 18px; margin:6px; border:none; border-radius:6px; background:#06b6d4; color:white; cursor:pointer; }
-button:hover { background:#0891b2; }
-.menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.menu-card { background:#0f172a; padding:25px; border-radius:10px; cursor:pointer; border:1px solid #374151; font-size:18px; }
-.menu-icon { font-size:28px; display:block; margin-bottom:10px; }
-.module { display:none; margin-top:20px; }
-#scanner { margin-top:20px; border:2px solid #06b6d4; border-radius:8px; width:550px; height: 600px; margin:auto; display:none; }
-input, select { padding:10px; margin:5px; border-radius:5px; border:none; }
-table { width:100%; margin-top:20px; border-collapse:collapse; background:#0f172a; }
-th, td { padding:10px; border:1px solid #374151; }
-th { background:#111827; color:white; }
-td button { background:#f87171; padding:4px 8px; margin:0; }
-td button:hover { background:#dc2626; }
-</style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
+
+        body {
+            background: #20263f;
+            color: #acacac;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .logo {
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .store {
+            color: red;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin: 6px;
+            border: none;
+            border-radius: 6px;
+            background: #06b6d4;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0891b2;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-card {
+            background: #0f172a;
+            padding: 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid #374151;
+            font-size: 18px;
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .module {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #scanner {
+            margin-top: 20px;
+            border: 2px solid #06b6d4;
+            border-radius: 8px;
+            width: 550px;
+            height: 600px;
+            margin: auto;
+            display: none;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: #0f172a;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #374151;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+        }
+
+        td button {
+            background: #f87171;
+            padding: 4px 8px;
+            margin: 0;
+        }
+
+        td button:hover {
+            background: #dc2626;
+        }
+    </style>
 </head>
 
 <body>
-<div class="container">
-<img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Levi%27s_logo.svg/1200px-Levi%27s_logo.svg.png">
-<h2 class="store">Outlet Levi's Punta Norte</h2>
-<h1>Sistema Inventario 2.0</h1>
+    <div class="container">
+        <img class="logo"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Levi%27s_logo.svg/1200px-Levi%27s_logo.svg.png">
+        <h2 class="store">Outlet Levi's Punta Norte</h2>
+        <h1>Sistema Inventario 2.0</h1>
 
-<!-- MENU -->
-<div id="menu">
-<div class="menu-grid">
-<div class="menu-card" onclick="abrirModulo('catalogo')"><span class="menu-icon">📥</span>Cargar Catálogo</div>
-<div class="menu-card" onclick="abrirModulo('precios', true)"><span class="menu-icon">💲</span>Consulta Precios</div>
-<div class="menu-card" onclick="abrirModulo('consulta', true)"><span class="menu-icon">📦</span>Consulta Inventario</div>
-<div class="menu-card" onclick="abrirModulo('conteo', true)"><span class="menu-icon">📊</span>Conteo Ubicación</div>
-<div class="menu-card" onclick="abrirModulo('movimiento', true)"><span class="menu-icon">🔄</span>Desplazo Mercancía</div>
-<div class="menu-card" onclick="abrirModulo('altaProductos', true)"><span class="menu-icon">➕</span>Alta Productos</div>
-<div class="menu-card" onclick="abrirModulo('altaUbicaciones')"><span class="menu-icon">📍</span>Alta Ubicaciones</div>
-<div class="menu-card" onclick="abrirModulo('merma', true)"><span class="menu-icon">⚠</span>Reporte Merma</div>
-</div>
-</div>
+        <!-- MENU -->
+        <div id="menu">
+            <div class="menu-grid">
+                <div class="menu-card" onclick="abrirModulo('catalogo')"><span class="menu-icon">📥</span>Cargar
+                    Catálogo</div>
+                <div class="menu-card" onclick="abrirModulo('precios', true)"><span class="menu-icon">💲</span>Consulta
+                    Precios</div>
+                <div class="menu-card" onclick="abrirModulo('consulta', true)"><span class="menu-icon">📦</span>Consulta
+                    Inventario</div>
+                <div class="menu-card" onclick="abrirModulo('conteo', true)"><span class="menu-icon">📊</span>Conteo
+                    Ubicación</div>
+                <div class="menu-card" onclick="abrirModulo('movimiento', true)"><span
+                        class="menu-icon">🔄</span>Desplazo Mercancía</div>
+                <div class="menu-card" onclick="abrirModulo('altaProductos', true)"><span class="menu-icon">➕</span>Alta
+                    Productos</div>
+                <div class="menu-card" onclick="abrirModulo('altaUbicaciones')"><span class="menu-icon">📍</span>Alta
+                    Ubicaciones</div>
+                <div class="menu-card" onclick="abrirModulo('merma', true)"><span class="menu-icon">⚠</span>Reporte
+                    Merma</div>
+            </div>
+        </div>
 
-<button id="volver" onclick="volverMenu()" style="display:none">Volver al menú</button>
-<div id="scanner"></div>
+        <button id="volver" onclick="volverMenu()" style="display:none">Volver al menú</button>
+        <div id="scanner"></div>
 
-<!-- MODULOS -->
-<div id="catalogo" class="module">
-<h2>Cargar Catálogo</h2>
-<input type="file" id="excelProductos" accept=".xlsx">
-<button onclick="cargarExcel()">Cargar</button>
-<button onclick="exportarProductos()">Exportar a Excel</button>
-<p id="estado"></p>
-<table>
-<thead><tr><th>Barcode</th><th>PC9</th><th>Precio</th><th>Descripción</th><th>Acciones</th></tr></thead>
-<tbody id="tablaProductos"></tbody>
-</table>
-</div>
+        <!-- MODULOS -->
+        <div id="catalogo" class="module">
+            <h2>Cargar Catálogo</h2>
+            <input type="file" id="excelProductos" accept=".xlsx">
+            <button onclick="cargarExcel()">Cargar</button>
+            <button onclick="exportarProductos()">Exportar a Excel</button>
+            <p id="estado"></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>PC9</th>
+                        <th>Precio</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductos"></tbody>
+            </table>
+        </div>
 
-<div id="precios" class="module">
-<h2>Consulta Precio</h2>
-<p>Barcode: <span id="p_barcode"></span></p>
-<p>PC9: <span id="p_pc9"></span></p>
-<p>Descripción: <span id="p_desc"></span></p>
-<p>Precio: $<span id="p_precio"></span></p>
-</div>
+        <div id="precios" class="module">
+            <h2>Consulta Precio</h2>
+            <p>Barcode: <span id="p_barcode"></span></p>
+            <p>PC9: <span id="p_pc9"></span></p>
+            <p>Descripción: <span id="p_desc"></span></p>
+            <p>Precio: $<span id="p_precio"></span></p>
+        </div>
 
-<div id="consulta" class="module">
-<h2>Inventario por Barcode</h2>
-<p>Barcode: <input id="barcodeConsulta" placeholder="Escanea o escribe barcode"> <button onclick="actualizarTablaConsulta(document.getElementById('barcodeConsulta').value)">Buscar</button> <button onclick="exportarInventario()">Exportar Excel</button></p>
-<table>
-<thead><tr><th>Ubicación</th><th>Piezas</th></tr></thead>
-<tbody id="tablaConsulta"></tbody>
-</table>
-</div>
+        <div id="consulta" class="module">
+            <h2>Inventario por Barcode</h2>
+            <p>Barcode: <input id="barcodeConsulta" placeholder="Escanea o escribe barcode"> <button
+                    onclick="actualizarTablaConsulta(document.getElementById('barcodeConsulta').value)">Buscar</button>
+                <button onclick="exportarInventario()">Exportar Excel</button></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Piezas</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaConsulta"></tbody>
+            </table>
+        </div>
 
-<div id="conteo" class="module">
-<h2>Conteo por Ubicación</h2>
-<p>Ubicación: <input id="ubicacionConteoInput" placeholder="Ej. A01"></p>
-<table>
-<thead><tr><th>Barcode</th><th>Piezas</th></tr></thead>
-<tbody id="tablaConteo"></tbody>
-</table>
-<button onclick="registrarConteo()">Registrar Conteo</button>
-</div>
+        <div id="conteo" class="module">
+            <h2>Conteo por Ubicación</h2>
+            <p>Ubicación: <input id="ubicacionConteoInput" placeholder="Ej. A01"></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Piezas</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaConteo"></tbody>
+            </table>
+            <button onclick="registrarConteo()">Registrar Conteo</button>
+        </div>
 
-<div id="movimiento" class="module">
-<h2>Desplazo Mercancía</h2>
-<p>Origen: <input id="origenMovimiento" placeholder="Ej. A01"></p>
-<p>Destino: <input id="destinoMovimiento" placeholder="Ej. B02"></p>
-<table>
-<thead><tr><th>Barcode</th><th>Piezas</th></tr></thead>
-<tbody id="tablaMovimiento"></tbody>
-</table>
-<button onclick="aplicarMovimiento()">Aplicar</button>
-<button onclick="limpiarMovimiento()">Cancelar</button>
-</div>
+        <div id="movimiento" class="module">
+            <h2>Desplazo Mercancía</h2>
+            <p>Origen: <input id="origenMovimiento" placeholder="Ej. A01"></p>
+            <p>Destino: <input id="destinoMovimiento" placeholder="Ej. B02"></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Piezas</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMovimiento"></tbody>
+            </table>
+            <button onclick="aplicarMovimiento()">Aplicar</button>
+            <button onclick="limpiarMovimiento()">Cancelar</button>
+        </div>
 
-<div id="altaProductos" class="module">
-<h2>Alta Productos</h2>
-<input id="barcodeNuevo" readonly placeholder="Escanea barcode">
-<input id="pc9Nuevo" placeholder="PC9">
-<input id="precioNuevo" placeholder="Precio">
-<input id="descNuevo" placeholder="Descripción">
-<button onclick="agregarProducto()">Agregar</button>
-<table>
-<thead><tr><th>Barcode</th><th>PC9</th><th>Precio</th><th>Descripción</th><th>Acciones</th></tr></thead>
-<tbody id="tablaProductos"></tbody>
-</table>
-</div>
+        <div id="altaProductos" class="module">
+            <h2>Alta Productos</h2>
+            <input id="barcodeNuevo" readonly placeholder="Escanea barcode">
+            <input id="pc9Nuevo" placeholder="PC9">
+            <input id="precioNuevo" placeholder="Precio">
+            <input id="descNuevo" placeholder="Descripción">
+            <button onclick="agregarProducto()">Agregar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>PC9</th>
+                        <th>Precio</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductos"></tbody>
+            </table>
+        </div>
 
-<div id="altaUbicaciones" class="module">
-<h2>Alta Ubicaciones</h2>
-<select id="sitio"><option>salesfloor</option><option>stockroom</option></select>
-<input id="ubicacionNueva" placeholder="Ubicación">
-<button onclick="agregarUbicacion()">Agregar</button>
-<table>
-<thead><tr><th>Sitio</th><th>Ubicación</th><th>Acciones</th></tr></thead>
-<tbody id="tablaUbicaciones"></tbody>
-</table>
-</div>
+        <div id="altaUbicaciones" class="module">
+            <h2>Alta Ubicaciones</h2>
+            <select id="sitio">
+                <option>salesfloor</option>
+                <option>stockroom</option>
+            </select>
+            <input id="ubicacionNueva" placeholder="Ubicación">
+            <button onclick="agregarUbicacion()">Agregar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sitio</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaUbicaciones"></tbody>
+            </table>
+        </div>
 
-<div id="merma" class="module">
-<h2>Reporte Merma</h2>
-<input id="barcodeMerma" readonly placeholder="Escanea barcode">
-<input id="motivoMerma" placeholder="Motivo">
-<button onclick="registrarMerma()">Registrar</button>
-<button onclick="exportarMerma()">Exportar Excel</button>
-<table>
-<thead><tr><th>Barcode</th><th>Motivo</th></tr></thead>
-<tbody id="tablaMerma"></tbody>
-</table>
-</div>
+        <div id="merma" class="module">
+            <h2>Reporte Merma</h2>
+            <input id="barcodeMerma" readonly placeholder="Escanea barcode">
+            <input id="motivoMerma" placeholder="Motivo">
+            <button onclick="registrarMerma()">Registrar</button>
+            <button onclick="exportarMerma()">Exportar Excel</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMerma"></tbody>
+            </table>
+        </div>
 
-<script>
-/* BASE DATOS */
-let productosDB = JSON.parse(localStorage.getItem("productosDB") || "{}");
-let inventario = JSON.parse(localStorage.getItem("inventario") || "{}");
-let ubicaciones = JSON.parse(localStorage.getItem("ubicaciones") || "[]");
-let merma = JSON.parse(localStorage.getItem("merma") || "[]");
+        <script>
+            /* BASE DATOS */
+            let productosDB = JSON.parse(localStorage.getItem("productosDB") || "{}");
+            let inventario = JSON.parse(localStorage.getItem("inventario") || "{}");
+            let ubicaciones = JSON.parse(localStorage.getItem("ubicaciones") || "[]");
+            let merma = JSON.parse(localStorage.getItem("merma") || "[]");
 
-/* AUX */
-let ultimoScan = "";
+            /* AUX */
+            let ultimoScan = "";
 
-/* MENU */
-function abrirModulo(id, scan=false){
-document.getElementById("menu").style.display="none";
-document.getElementById("volver").style.display="block";
-document.querySelectorAll(".module").forEach(m=>m.style.display="none");
-document.getElementById(id).style.display="block";
-if(scan) iniciarScanner(); else detenerScanner();
-}
-function volverMenu(){
-document.getElementById("menu").style.display="block";
-document.getElementById("volver").style.display="none";
-document.querySelectorAll(".module").forEach(m=>m.style.display="none");
-detenerScanner();
-}
+            /* MENU */
+            function abrirModulo(id, scan = false) {
+                document.getElementById("menu").style.display = "none";
+                document.getElementById("volver").style.display = "block";
+                document.querySelectorAll(".module").forEach(m => m.style.display = "none");
+                document.getElementById(id).style.display = "block";
+                if (scan) iniciarScanner(); else detenerScanner();
+            }
+            function volverMenu() {
+                document.getElementById("menu").style.display = "block";
+                document.getElementById("volver").style.display = "none";
+                document.querySelectorAll(".module").forEach(m => m.style.display = "none");
+                detenerScanner();
+            }
 
-/* SCANNER */
-let activo=false;
-function iniciarScanner(){
-document.getElementById("scanner").style.display="block";
-if(activo) return;
-Quagga.init({
-inputStream:{ type:"LiveStream", target:"#scanner", constraints:{facingMode:"environment"} },
-decoder:{ readers:["upc_reader"] },
-locate:true
-}, err=>{ if(!err){ Quagga.start(); activo=true; } });
-}
-function detenerScanner(){
-if(activo){ Quagga.stop(); activo=false; }
-document.getElementById("scanner").style.display="none";
-}
-Quagga.onDetected(data=>{
-const code = data.codeResult.code;
-if(code===ultimoScan) return;
-ultimoScan = code;
-setTimeout(()=>ultimoScan="",1500);
+            /* SCANNER */
+            let activo = false;
+            function iniciarScanner() {
+                document.getElementById("scanner").style.display = "block";
+                if (activo) return;
+                Quagga.init({
+                    inputStream: {
+                        type: "LiveStream", target: "#scanner", constraints: {
+                            facingMode: "environment", width: { min: 320, ideal: 640, max: 1280 },
+                            height: { min: 240, ideal: 480, max: 720 }
+                        }
+                    },
+                    decoder: { readers: ["upc_reader"] },
+                    locate: true
+                }, err => { if (!err) { Quagga.start(); activo = true; } });
+            }
+            function detenerScanner() {
+                if (activo) { Quagga.stop(); activo = false; }
+                document.getElementById("scanner").style.display = "none";
+            }
+            Quagga.onDetected(data => {
+                const code = data.codeResult.code;
+                if (code === ultimoScan) return;
+                ultimoScan = code;
+                setTimeout(() => ultimoScan = "", 1500);
 
-if(document.getElementById("precios").style.display==="block"){
-const p = productosDB[code];
-if(p){
-document.getElementById("p_barcode").innerText=code;
-document.getElementById("p_pc9").innerText=p.pc9;
-document.getElementById("p_desc").innerText=p.desc;
-document.getElementById("p_precio").innerText=p.precio;
-}
-}
-if(document.getElementById("altaProductos").style.display==="block") document.getElementById("barcodeNuevo").value=code;
-if(document.getElementById("merma").style.display==="block") document.getElementById("barcodeMerma").value=code;
-});
+                if (document.getElementById("precios").style.display === "block") {
+                    const p = productosDB[code];
+                    if (p) {
+                        document.getElementById("p_barcode").innerText = code;
+                        document.getElementById("p_pc9").innerText = p.pc9;
+                        document.getElementById("p_desc").innerText = p.desc;
+                        document.getElementById("p_precio").innerText = p.precio;
+                    }
+                }
+                if (document.getElementById("altaProductos").style.display === "block") document.getElementById("barcodeNuevo").value = code;
+                if (document.getElementById("merma").style.display === "block") document.getElementById("barcodeMerma").value = code;
+            });
 
-/* PRODUCTOS */
-function agregarProducto(){
-const b=document.getElementById("barcodeNuevo").value;
-if(!b) return alert("Escanea un barcode");
-productosDB[b]={ pc9: document.getElementById("pc9Nuevo").value, desc: document.getElementById("descNuevo").value, precio: document.getElementById("precioNuevo").value };
-localStorage.setItem("productosDB", JSON.stringify(productosDB));
-actualizarTablaProductos();
-}
-function editarProducto(barcode){
-const p = productosDB[barcode];
-if(!p) return;
-const pc9 = prompt("PC9",p.pc9);
-const precio = prompt("Precio",p.precio);
-const desc = prompt("Descripción",p.desc);
-productosDB[barcode]={pc9,precio,desc};
-localStorage.setItem("productosDB", JSON.stringify(productosDB));
-actualizarTablaProductos();
-}
-function eliminarProducto(barcode){
-if(confirm("Eliminar producto "+barcode+"?")){ delete productosDB[barcode]; localStorage.setItem("productosDB", JSON.stringify(productosDB)); actualizarTablaProductos();}
-}
-function actualizarTablaProductos(){
-const tbody=document.getElementById("tablaProductos"); tbody.innerHTML="";
-for(let b in productosDB){
-const p=productosDB[b];
-tbody.innerHTML+=`<tr><td>${b}</td><td>${p.pc9}</td><td>${p.precio}</td><td>${p.desc}</td>
+            /* PRODUCTOS */
+            function agregarProducto() {
+                const b = document.getElementById("barcodeNuevo").value;
+                if (!b) return alert("Escanea un barcode");
+                productosDB[b] = { pc9: document.getElementById("pc9Nuevo").value, desc: document.getElementById("descNuevo").value, precio: document.getElementById("precioNuevo").value };
+                localStorage.setItem("productosDB", JSON.stringify(productosDB));
+                actualizarTablaProductos();
+            }
+            function editarProducto(barcode) {
+                const p = productosDB[barcode];
+                if (!p) return;
+                const pc9 = prompt("PC9", p.pc9);
+                const precio = prompt("Precio", p.precio);
+                const desc = prompt("Descripción", p.desc);
+                productosDB[barcode] = { pc9, precio, desc };
+                localStorage.setItem("productosDB", JSON.stringify(productosDB));
+                actualizarTablaProductos();
+            }
+            function eliminarProducto(barcode) {
+                if (confirm("Eliminar producto " + barcode + "?")) { delete productosDB[barcode]; localStorage.setItem("productosDB", JSON.stringify(productosDB)); actualizarTablaProductos(); }
+            }
+            function actualizarTablaProductos() {
+                const tbody = document.getElementById("tablaProductos"); tbody.innerHTML = "";
+                for (let b in productosDB) {
+                    const p = productosDB[b];
+                    tbody.innerHTML += `<tr><td>${b}</td><td>${p.pc9}</td><td>${p.precio}</td><td>${p.desc}</td>
 <td><button onclick="editarProducto('${b}')">Editar</button> <button onclick="eliminarProducto('${b}')">Eliminar</button></td></tr>`;
-}
+                }
 
-/* Actualiza consulta inventario si hay barcode */
-const barcode=document.getElementById("barcodeConsulta")?.value;
-if(barcode) actualizarTablaConsulta(barcode);
-}
+                /* Actualiza consulta inventario si hay barcode */
+                const barcode = document.getElementById("barcodeConsulta")?.value;
+                if (barcode) actualizarTablaConsulta(barcode);
+            }
 
-/* UBICACIONES */
-function agregarUbicacion(){
-const s=document.getElementById("sitio").value;
-const u=document.getElementById("ubicacionNueva").value.trim();
-if(!u) return alert("Ingresa ubicación");
-if(ubicaciones.find(x=>x.u===u)) return alert("Ubicación duplicada");
-ubicaciones.push({s,u});
-localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones));
-actualizarTablaUbicaciones();
-}
-function editarUbicacion(u){
-const item=ubicaciones.find(x=>x.u===u); if(!item) return;
-const s=prompt("Sitio",item.s); const nu=prompt("Ubicación",item.u);
-item.s=s; item.u=nu;
-localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones));
-actualizarTablaUbicaciones();
-}
-function eliminarUbicacion(u){
-if(confirm("Eliminar ubicación "+u+"?")){ ubicaciones=ubicaciones.filter(x=>x.u!==u); localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones)); actualizarTablaUbicaciones();}
-}
-function actualizarTablaUbicaciones(){
-const tbody=document.getElementById("tablaUbicaciones"); tbody.innerHTML="";
-ubicaciones.forEach(x=>tbody.innerHTML+=`<tr><td>${x.s}</td><td>${x.u}</td><td><button onclick="editarUbicacion('${x.u}')">Editar</button> <button onclick="eliminarUbicacion('${x.u}')">Eliminar</button></td></tr>`);
-}
+            /* UBICACIONES */
+            function agregarUbicacion() {
+                const s = document.getElementById("sitio").value;
+                const u = document.getElementById("ubicacionNueva").value.trim();
+                if (!u) return alert("Ingresa ubicación");
+                if (ubicaciones.find(x => x.u === u)) return alert("Ubicación duplicada");
+                ubicaciones.push({ s, u });
+                localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones));
+                actualizarTablaUbicaciones();
+            }
+            function editarUbicacion(u) {
+                const item = ubicaciones.find(x => x.u === u); if (!item) return;
+                const s = prompt("Sitio", item.s); const nu = prompt("Ubicación", item.u);
+                item.s = s; item.u = nu;
+                localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones));
+                actualizarTablaUbicaciones();
+            }
+            function eliminarUbicacion(u) {
+                if (confirm("Eliminar ubicación " + u + "?")) { ubicaciones = ubicaciones.filter(x => x.u !== u); localStorage.setItem("ubicaciones", JSON.stringify(ubicaciones)); actualizarTablaUbicaciones(); }
+            }
+            function actualizarTablaUbicaciones() {
+                const tbody = document.getElementById("tablaUbicaciones"); tbody.innerHTML = "";
+                ubicaciones.forEach(x => tbody.innerHTML += `<tr><td>${x.s}</td><td>${x.u}</td><td><button onclick="editarUbicacion('${x.u}')">Editar</button> <button onclick="eliminarUbicacion('${x.u}')">Eliminar</button></td></tr>`);
+            }
 
-/* MERMA */
-function registrarMerma(){
-const b=document.getElementById("barcodeMerma").value;
-const m=document.getElementById("motivoMerma").value;
-if(!b||!m) return alert("Escanea barcode y escribe motivo");
-merma.push({b,m});
-localStorage.setItem("merma", JSON.stringify(merma));
-actualizarTablaMerma();
-}
-function actualizarTablaMerma(){
-const tbody=document.getElementById("tablaMerma"); tbody.innerHTML="";
-merma.forEach(x=>tbody.innerHTML+=`<tr><td>${x.b}</td><td>${x.m}</td></tr>`);
-}
+            /* MERMA */
+            function registrarMerma() {
+                const b = document.getElementById("barcodeMerma").value;
+                const m = document.getElementById("motivoMerma").value;
+                if (!b || !m) return alert("Escanea barcode y escribe motivo");
+                merma.push({ b, m });
+                localStorage.setItem("merma", JSON.stringify(merma));
+                actualizarTablaMerma();
+            }
+            function actualizarTablaMerma() {
+                const tbody = document.getElementById("tablaMerma"); tbody.innerHTML = "";
+                merma.forEach(x => tbody.innerHTML += `<tr><td>${x.b}</td><td>${x.m}</td></tr>`);
+            }
 
-/* CONTEO */
-function registrarConteo(){
-const ubic=document.getElementById("ubicacionConteoInput").value.trim();
-if(!ubic) return alert("Ingresa ubicación");
-if(!inventario[ubic]) inventario[ubic]={};
-const barcode=document.getElementById("barcodeNuevo").value;
-if(!barcode) return alert("Escanea un barcode");
-inventario[ubic][barcode]=(inventario[ubic][barcode]||0)+1;
-localStorage.setItem("inventario", JSON.stringify(inventario));
-actualizarTablaConteo(ubic);
-}
-function actualizarTablaConteo(ubic){
-const tbody=document.getElementById("tablaConteo"); tbody.innerHTML="";
-if(!inventario[ubic]) return;
-for(let b in inventario[ubic]){
-tbody.innerHTML+=`<tr><td>${b}</td><td>${inventario[ubic][b]}</td></tr>`;
-}
-}
+            /* CONTEO */
+            function registrarConteo() {
+                const ubic = document.getElementById("ubicacionConteoInput").value.trim();
+                if (!ubic) return alert("Ingresa ubicación");
+                if (!inventario[ubic]) inventario[ubic] = {};
+                const barcode = document.getElementById("barcodeNuevo").value;
+                if (!barcode) return alert("Escanea un barcode");
+                inventario[ubic][barcode] = (inventario[ubic][barcode] || 0) + 1;
+                localStorage.setItem("inventario", JSON.stringify(inventario));
+                actualizarTablaConteo(ubic);
+            }
+            function actualizarTablaConteo(ubic) {
+                const tbody = document.getElementById("tablaConteo"); tbody.innerHTML = "";
+                if (!inventario[ubic]) return;
+                for (let b in inventario[ubic]) {
+                    tbody.innerHTML += `<tr><td>${b}</td><td>${inventario[ubic][b]}</td></tr>`;
+                }
+            }
 
-/* MOVIMIENTOS */
-function aplicarMovimiento(){
-const ori=document.getElementById("origenMovimiento").value.trim();
-const dest=document.getElementById("destinoMovimiento").value.trim();
-if(!ori||!dest) return alert("Ingresa origen y destino");
-if(!inventario[ori]) return alert("Origen vacío");
-if(!inventario[dest]) inventario[dest]={};
-for(let b in inventario[ori]){
-inventario[dest][b]=(inventario[dest][b]||0)+inventario[ori][b];
-}
-inventario[ori]={};
-localStorage.setItem("inventario", JSON.stringify(inventario));
-alert("Movimiento aplicado"); limpiarMovimiento();
-}
-function limpiarMovimiento(){
-document.getElementById("origenMovimiento").value="";
-document.getElementById("destinoMovimiento").value="";
-document.getElementById("tablaMovimiento").innerHTML="";
-}
+            /* MOVIMIENTOS */
+            function aplicarMovimiento() {
+                const ori = document.getElementById("origenMovimiento").value.trim();
+                const dest = document.getElementById("destinoMovimiento").value.trim();
+                if (!ori || !dest) return alert("Ingresa origen y destino");
+                if (!inventario[ori]) return alert("Origen vacío");
+                if (!inventario[dest]) inventario[dest] = {};
+                for (let b in inventario[ori]) {
+                    inventario[dest][b] = (inventario[dest][b] || 0) + inventario[ori][b];
+                }
+                inventario[ori] = {};
+                localStorage.setItem("inventario", JSON.stringify(inventario));
+                alert("Movimiento aplicado"); limpiarMovimiento();
+            }
+            function limpiarMovimiento() {
+                document.getElementById("origenMovimiento").value = "";
+                document.getElementById("destinoMovimiento").value = "";
+                document.getElementById("tablaMovimiento").innerHTML = "";
+            }
 
-/* CONSULTA INVENTARIO */
-function actualizarTablaConsulta(barcode){
-const tbody=document.getElementById("tablaConsulta"); tbody.innerHTML="";
-for(let u in inventario){
-if(inventario[u][barcode]) tbody.innerHTML+=`<tr><td>${u}</td><td>${inventario[u][barcode]}</td></tr>`;
-}
+            /* CONSULTA INVENTARIO */
+            function actualizarTablaConsulta(barcode) {
+                const tbody = document.getElementById("tablaConsulta"); tbody.innerHTML = "";
+                for (let u in inventario) {
+                    if (inventario[u][barcode]) tbody.innerHTML += `<tr><td>${u}</td><td>${inventario[u][barcode]}</td></tr>`;
+                }
 
-/* Para exportación de inventario */
-document.getElementById("barcodeConsulta").value = barcode;
-}
+                /* Para exportación de inventario */
+                document.getElementById("barcodeConsulta").value = barcode;
+            }
 
-/* EXPORTACIONES */
-function exportarProductos(){
-const wb=XLSX.utils.book_new();
-const data=Object.keys(productosDB).map(b=>({Barcode:b,...productosDB[b]}));
-const ws=XLSX.utils.json_to_sheet(data);
-XLSX.utils.book_append_sheet(wb,ws,"Productos");
-XLSX.writeFile(wb,"Productos.xlsx");
-}
-function exportarInventario(){
-const wb=XLSX.utils.book_new();
-const data=[];
-for(let u in inventario){
-for(let b in inventario[u]){
-data.push({Ubicacion:u,Barcode:b,Piezas:inventario[u][b]});
-}
-}
-const ws=XLSX.utils.json_to_sheet(data);
-XLSX.utils.book_append_sheet(wb,ws,"Inventario");
-XLSX.writeFile(wb,"Inventario.xlsx");
-}
-function exportarMerma(){
-const wb=XLSX.utils.book_new();
-const ws=XLSX.utils.json_to_sheet(merma);
-XLSX.utils.book_append_sheet(wb,ws,"Merma");
-XLSX.writeFile(wb,"Merma.xlsx");
-}
+            /* EXPORTACIONES */
+            function exportarProductos() {
+                const wb = XLSX.utils.book_new();
+                const data = Object.keys(productosDB).map(b => ({ Barcode: b, ...productosDB[b] }));
+                const ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Productos");
+                XLSX.writeFile(wb, "Productos.xlsx");
+            }
+            function exportarInventario() {
+                const wb = XLSX.utils.book_new();
+                const data = [];
+                for (let u in inventario) {
+                    for (let b in inventario[u]) {
+                        data.push({ Ubicacion: u, Barcode: b, Piezas: inventario[u][b] });
+                    }
+                }
+                const ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+                XLSX.writeFile(wb, "Inventario.xlsx");
+            }
+            function exportarMerma() {
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(merma);
+                XLSX.utils.book_append_sheet(wb, ws, "Merma");
+                XLSX.writeFile(wb, "Merma.xlsx");
+            }
 
-/* CARGA EXCEL */
-function cargarExcel(){
-const file=document.getElementById("excelProductos").files[0];
-if(!file) return alert("Selecciona un archivo");
-const reader=new FileReader();
-reader.onload=e=>{
-const data=new Uint8Array(e.target.result);
-const workbook=XLSX.read(data,{type:'array'});
-const sheet=workbook.Sheets[workbook.SheetNames[0]];
-const rows=XLSX.utils.sheet_to_json(sheet);
-let count=0;
-rows.forEach(r=>{
-if(!r.BARCODE) return;
-productosDB[r.BARCODE]={pc9:r.PC9||"",desc:r.DESCRIPCION||"",precio:r.PRECIO||0};
-count++;
-});
-localStorage.setItem("productosDB", JSON.stringify(productosDB));
-document.getElementById("estado").innerText="Productos cargados: "+count;
-actualizarTablaProductos();
-};
-reader.readAsArrayBuffer(file);
-}
+            /* CARGA EXCEL */
+            function cargarExcel() {
+                const file = document.getElementById("excelProductos").files[0];
+                if (!file) return alert("Selecciona un archivo");
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+                    let count = 0;
+                    rows.forEach(r => {
+                        if (!r.BARCODE) return;
+                        productosDB[r.BARCODE] = { pc9: r.PC9 || "", desc: r.DESCRIPCION || "", precio: r.PRECIO || 0 };
+                        count++;
+                    });
+                    localStorage.setItem("productosDB", JSON.stringify(productosDB));
+                    document.getElementById("estado").innerText = "Productos cargados: " + count;
+                    actualizarTablaProductos();
+                };
+                reader.readAsArrayBuffer(file);
+            }
 
-/* INICIALIZACIÓN */
-actualizarTablaProductos();
-actualizarTablaUbicaciones();
-actualizarTablaMerma();
+            /* INICIALIZACIÓN */
+            actualizarTablaProductos();
+            actualizarTablaUbicaciones();
+            actualizarTablaMerma();
 
-</script>
+        </script>
 </body>
+
 </html>
