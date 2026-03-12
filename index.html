@@ -175,7 +175,7 @@ document.getElementById("scanner").style.display="block";
 if(activo) return;
 Quagga.init({
 inputStream:{ type:"LiveStream", target:"#scanner", constraints:{facingMode:"environment"} },
-decoder:{ readers:["upc_reader","ean_reader","code_128_reader"] },
+decoder:{ readers:["upc_reader"] },
 locate:true
 }, err=>{ if(!err){ Quagga.start(); activo=true; } });
 }
