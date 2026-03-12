@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Merma - Outlet Levis</title>
+    <!--<script src="https://html5quintus.com/quintus/libs/quintus_components.js"></script>-->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0056b3;
+        }
+        
+        h1 {
+            color: #0056b3;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .store-info {
+            background-color: #e9f7fe;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #003d82;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .camera-container {
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        #video {
+            width: 100%;
+            border-radius: 5px;
+            background-color: #000;
+        }
+        
+        #result {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .product-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        #barcode-log {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        
+        .log-entry {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .actions button {
+            flex: 1;
+        }
+        
+        #download-btn {
+            background-color: #28a745;
+        }
+        
+        #download-btn:hover {
+            background-color: #218838;
+        }
+        
+        #clear-btn {
+            background-color: #dc3545;
+        }
+        
+        #clear-btn:hover {
+            background-color: #c82333;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            input, textarea, button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Registro de Merma</h1>
+            <div class="store-info">
+                <p><strong>Sitio:</strong> 7522 - OUTLET LEVIS PUNTA NORTE</p>
+            </div>
+        </header>
+        
+        <div class="form-group">
+            <label for="barcode">Código de Barras (PC13):</label>
+            <input type="text" id="barcode" placeholder="Escanear código de barras" autocomplete="off">
+            <button id="scan-btn" style="margin-top: 10px;">Escanear con Cámara</button>
+        </div>
+        
+        <div class="camera-container" id="camera-view" style="display: none;">
+            <video id="video" autoplay playsinline></video>
+            <button id="capture-btn"></button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="product-info" id="product-info" style="display: none;">
+            <h3>Información del Producto</h3>
+            <p><strong>PC9:</strong> <span id="product-pc9"></span></p>
+            <p><strong>Descripción:</strong> <span id="product-description"></span></p>
+        </div>
+        
+        <div class="form-group">
+            <label for="defect">Defecto/Notas:</label>
+            <textarea id="defect" placeholder="Describa el defecto o problema..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="photo">Foto (desde Google Drive):</label>
+            <input type="text" id="photo" placeholder="Pegue el enlace de Google Drive de la foto">
+        </div>
+        
+        <button id="save-btn">Guardar Registro</button>
+        
+        <div id="barcode-log">
+            <h3>Registros Guardados</h3>
+            <div id="log-entries"></div>
+        </div>
+        
+        <div class="actions">
+            <button id="download-btn">Descargar CSV</button>
+            <button id="clear-btn">Limpiar Registros</button>
+        </div>
+    </div>
+    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+    <script>
+        // Base de datos simulada de productos (extraída del Excel)
+        const productDatabase = [
+        {
+        PC9: "12365-7894",
+        barcode: "123456123456",
+        descripcion: "Tee Graphic Levis",
+        ubicacion: "A1"
+        },
+        {
+        PC9: "12345-1234",
+        barcode: "789456789456",
+        descripcion: "Jeans Levis",
+        ubicacion: "B3"
+        }
+        ];
+
+        // Variables globales
+        let registros = JSON.parse(localStorage.getItem('mermaRegistros')) || [];
+        let scanning = false;
+        let stream = null;
+
+        // Elementos DOM
+        const barcodeInput = document.getElementById('barcode');
+        const scanBtn = document.getElementById('scan-btn');
+        const cameraView = document.getElementById('camera-view');
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('capture-btn');
+        const resultDiv = document.getElementById('result');
+        const productInfo = document.getElementById('product-info');
+        const productPC13 = document.getElementById('product-pc9');
+        const productBarcode = document.getElementById('product-barcode');
+        const productDescription = document.getElementById('product-description');
+        const defectInput = document.getElementById('defect');
+        const photoInput = document.getElementById('photo');
+        const saveBtn = document.getElementById('save-btn');
+        const logEntries = document.getElementById('log-entries');
+        const downloadBtn = document.getElementById('download-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarRegistros();
+            
+            // Event listeners
+            barcodeInput.addEventListener('change', handleBarcodeInput);
+            scanBtn.addEventListener('click', toggleBarcodeScanner);
+            captureBtn.addEventListener('click', captureBarcode);
+            saveBtn.addEventListener('click', guardarRegistro);
+            downloadBtn.addEventListener('click', descargarCSV);
+            clearBtn.addEventListener('click', limpiarRegistros);
+        });
+
+        // Manejar entrada de código de barras
+        function handleBarcodeInput() {
+            const pc13 = barcodeInput.value.trim();
+            if (pc13) {
+                buscarProducto(pc13);
+            }
+        }
+
+        // Buscar producto en la base de datos
+        function buscarProducto(barcode) {
+
+    const producto = productDatabase.find(p => p.barcode === barcode);
+
+    productInfo.style.display = 'block';
+
+    if (producto) {
+
+        productPC13.textContent = producto.PC9;
+        productBarcode.textContent = producto.barcode;
+        productDescription.textContent = producto.descripcion;
+
+        resultDiv.textContent = "Producto encontrado correctamente";
+        resultDiv.className = "success";
+
+    } else {
+
+        productPC13.textContent = "-";
+        productBarcode.textContent = barcode;
+        productDescription.textContent = "Producto no encontrado";
+
+        resultDiv.textContent = "Producto no encontrado";
+        resultDiv.className = "error";
+    }
+}
+
+        // Alternar el escáner de código de barras
+        function toggleBarcodeScanner() {
+            if (scanning) {
+                detenerCamara();
+                scanBtn.textContent = "Escanear con Cámara";
+                scanning = false;
+            } else {
+                iniciarCamara();
+                scanBtn.textContent = "Detener Escaneo";
+                scanning = true;
+            }
+        }
+
+        // Iniciar la cámara
+        async function iniciarCamara() {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+            video.srcObject = stream;
+            cameraView.style.display = 'block';
+        // Iniciar escaneo con Quagga
+    Quagga.init({
+        inputStream: {
+            type: "LiveStream",
+            constraints: {
+                width: 640,
+                height: 480,
+                facingMode: "environment", // cámara trasera
+            },
+            target: video // <video id="video"\>
+        },
+        decoder: {
+            readers: ["code_128_reader"]
+        }
+    }, function(err) {
+        if (err) {
+            console.error("Error al iniciar Quagga:", err);
+            resultDiv.textContent = "Error al iniciar escaneo.";
+            resultDiv.className = "error";
+            return;
+        }
+        Quagga.start();
+        resultDiv.className = "";
+    });
+        }
+    // Detectar código de barras
+    Quagga.onDetected(function(result) {
+        const codigo_result = result.codeResult.code;
+        barcodeInput.value = codigo_result;
+        buscarProducto(codigo_result);
+        detenerCamara();
+    });
+//}
+
+    // Detener cámara y Quagga
+function detenerCamara() {
+     if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+    stream = null;
+  }
+    Quagga.stop();
+    cameraView.style.display = 'none';
+    scanBtn.textContent = "Escanear con Cámara";
+    scanning = false;
+    handleBarcodeInput()
+}
+
+        // Detener la cámara
+        //function detenerCamara() {
+        //    if (stream) {
+        //        stream.getTracks().forEach(track => track.stop());
+        //        stream = null;
+        //    }
+        //    cameraView.style.display = 'none';
+       // }
+
+        // Capturar código de barras (simulado)
+        function captureBarcode() {
+
+    resultDiv.textContent = "Enfoca el código...";
+    resultDiv.className = "";
+
+    setTimeout(() => {
+
+        const codigos = productDatabase.map(p => p.barcode);
+        const codigo = codigos[Math.floor(Math.random() * codigos.length)];
+
+        barcodeInput.value = codigo;
+
+        buscarProducto(codigo);
+
+        detenerCamara();
+
+    }, 2000);
+}
+
+        // Guardar registro
+        function guardarRegistro() {
+
+    const barcode = barcodeInput.value.trim();
+    const defecto = defectInput.value.trim();
+    const foto = photoInput.value.trim();
+
+    if (!barcode) {
+        resultDiv.textContent = "Por favor, escanee un código";
+        resultDiv.className = "error";
+        return;
+    }
+
+    const producto = productDatabase.find(p => p.barcode === barcode);
+
+    const registro = {
+        sitio: "7522",
+        tienda: "OUTLET LEVIS PUNTA NORTE",
+        pc9: producto ? producto.PC9 : "",
+        barcode: barcode,
+        descripcion: producto ? producto.descripcion : "Producto no encontrado",
+        ubicacion: producto ? producto.ubicacion : "",
+        pieza: "1",
+        defecto: defecto,
+        foto: foto,
+        fecha: new Date().toLocaleString()
+    };
+
+    registros.push(registro);
+    localStorage.setItem('mermaRegistros', JSON.stringify(registros));
+
+    resultDiv.textContent = "Registro guardado correctamente";
+    resultDiv.className = "success";
+
+    barcodeInput.value = "";
+    defectInput.value = "";
+    photoInput.value = "";
+    productInfo.style.display = "none";
+
+    actualizarRegistros();
+}
+       
+        // Actualizar lista de registros
+        function actualizarRegistros() {
+            logEntries.innerHTML = '';
+            
+            if (registros.length === 0) {
+                logEntries.innerHTML = '<p>No hay registros guardados</p>';
+                return;
+            }
+            
+            registros.forEach((reg, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <p><strong>${reg.fecha}</strong> - ${reg.pc13}</p>
+                    <p>${reg.descripcion}</p>
+                    <p>Defecto: ${reg.defecto || 'Ninguno'}</p>
+                `;
+                logEntries.appendChild(entry);
+            });
+        }
+
+        // Descargar CSV
+        function descargarCSV() {
+            if (registros.length === 0) {
+                resultDiv.textContent = "No hay registros para descargar";
+                resultDiv.className = "error";
+                return;
+            }
+            
+            let csv = "SITECODE,TIENDA,PC13,DESCRIPCION,Pieza,Defecto,Link de foto,Fecha\n";
+            
+            registros.forEach(reg => {
+                csv += `"${reg.sitio}","${reg.tienda}","${reg.pc13}","${reg.descripcion}","${reg.pieza}","${reg.defecto}","${reg.foto}","${reg.fecha}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'inventario_merma.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            resultDiv.textContent = "CSV descargado correctamente";
+            resultDiv.className = "success";
+        }
+
+        // Limpiar registros
+        function limpiarRegistros() {
+            if (confirm("¿Está seguro de que desea eliminar todos los registros?")) {
+                registros = [];
+                localStorage.removeItem('mermaRegistros');
+                actualizarRegistros();
+                resultDiv.textContent = "Registros eliminados";
+                resultDiv.className = "success";
+            }
+        }
+    </script>
+    
+</body>
+</html>
