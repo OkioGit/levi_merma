@@ -339,8 +339,8 @@
                     inputStream: {
                         type: "LiveStream", target: "#scanner", constraints: {
                             facingMode: "environment", 
-                            width: { ideal: window.innerWidth },   // Ancho de pantalla
-                            height: { ideal: window.innerHeight / 2 } // Mitad de pantalla
+                            width: { ideal: 640 },   // Ancho de pantalla
+                            height: { ideal: 480 } // Mitad de pantalla
                         }
                     },
                     decoder: { readers: ["upc_reader"] },
